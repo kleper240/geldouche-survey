@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créez le gel douche de vos rêves</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080810;
+    --bg2: #0f0f1a;
+    --card: #13131f;
+    --border: #232338;
+    --accent: #d4a96a;
+    --accent2: #8b7fd4;
+    --text: #ece9f8;
+    --muted: #6b698a;
+    --success: #4ecb8d;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* grain overlay */
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: .35;
+  }
+
+  header {
+    position: sticky; top: 0; z-index: 50;
+    padding: 1.1rem 2rem;
+    background: rgba(8,8,16,.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .logo { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:var(--accent); letter-spacing:.08em; }
+  .logo span { font-style:italic; }
+
+  .hero {
+    text-align:center;
+    padding: 5rem 1.5rem 3rem;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(139,127,212,.18) 0%, transparent 70%);
+    position: relative; z-index:1;
+  }
+  .pill {
+    display:inline-block; margin-bottom:1.5rem;
+    padding: .35rem 1.1rem; border-radius:999px;
+    background: rgba(212,169,106,.1); border:1px solid rgba(212,169,106,.25);
+    color:var(--accent); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+  }
+  .hero h1 {
+    font-family:'Cormorant Garamond',serif; font-weight:300;
+    font-size: clamp(2.2rem,6vw,3.8rem); line-height:1.15; color:var(--text);
+  }
+  .hero h1 em { color:var(--accent); font-style:italic; }
+  .hero p { margin-top:1.1rem; color:var(--muted); max-width:480px; margin-inline:auto; line-height:1.8; font-size:.92rem; }
+
+  .form-wrap { max-width:660px; margin:0 auto; padding:0 1.5rem 6rem; position:relative; z-index:1; }
+
+  .block {
+    background: var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:2rem; margin-bottom:1.1rem;
+    opacity:0; transform:translateY(20px);
+    animation: up .5s ease forwards;
+  }
+  @keyframes up { to{opacity:1;transform:translateY(0)} }
+  .block:nth-child(1){animation-delay:.06s}
+  .block:nth-child(2){animation-delay:.12s}
+  .block:nth-child(3){animation-delay:.18s}
+  .block:nth-child(4){animation-delay:.24s}
+
+  .blk-header {
+    display:flex; align-items:center; gap:.75rem; margin-bottom:1.6rem;
+  }
+  .blk-num {
+    width:28px; height:28px; border-radius:8px; flex-shrink:0;
+    background: rgba(139,127,212,.15); border:1px solid rgba(139,127,212,.3);
+    color:var(--accent2); font-size:.75rem; font-weight:500;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .blk-title { font-size:.72rem; text-transform:uppercase; letter-spacing:.14em; color:var(--accent2); }
+
+  .q { margin-bottom:1.6rem; }
+  .q:last-child { margin-bottom:0; }
+  .q-text { font-size:.95rem; font-weight:400; color:var(--text); margin-bottom:.9rem; line-height:1.55; }
+  .q-note { font-size:.78rem; color:var(--muted); font-style:italic; margin-bottom:.75rem; }
+  .limit { font-size:.75rem; color:var(--muted); margin-left:.5rem; }
+
+  .choices { display:flex; flex-direction:column; gap:.55rem; }
+  .choice-item { display:flex; align-items:flex-start; gap:.8rem; cursor:pointer; }
+  .choice-item input { display:none; }
+  .cbox {
+    flex-shrink:0; width:20px; height:20px; margin-top:1px;
+    border-radius:6px; border:1.5px solid var(--border); background:var(--bg2);
+    transition:all .2s; display:flex; align-items:center; justify-content:center;
+  }
+  .choice-item input[type="radio"] ~ .cbox { border-radius:50%; }
+  .choice-item input:checked ~ .cbox { background:var(--accent); border-color:var(--accent); }
+  .choice-item input:checked ~ .cbox::after { content:'✓'; color:#080810; font-size:.68rem; font-weight:700; }
+  .choice-item input[type="radio"]:checked ~ .cbox::after { content:''; width:7px; height:7px; background:#080810; border-radius:50%; }
+  .clabel { font-size:.88rem; color:var(--muted); line-height:1.45; transition:color .2s; }
+  .choice-item:hover .clabel { color:var(--text); }
+  .choice-item input:checked ~ .clabel { color:var(--text); }
+
+  textarea {
+    width:100%; background:var(--bg2); border:1.5px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:.88rem; padding:.9rem 1rem; resize:vertical; min-height:85px;
+    transition:border-color .2s; outline:none; font-weight:300;
+  }
+  textarea:focus { border-color:var(--accent2); }
+  textarea::placeholder { color:var(--muted); }
+
+  .submit-btn {
+    width:100%; padding:1.05rem; margin-top:1rem;
+    border-radius:12px; border:none; cursor:pointer;
+    background: linear-gradient(135deg, #d4a96a, #e8c48a);
+    color:#080810; font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:500;
+    letter-spacing:.03em; transition:opacity .2s, transform .15s;
+  }
+  .submit-btn:hover { opacity:.88; transform:translateY(-2px); }
+
+  .success-box {
+    display:none; text-align:center; padding:3.5rem 2rem;
+    background:var(--card); border-radius:18px; border:1px solid rgba(78,203,141,.25);
+    margin-top:1rem;
+  }
+  .success-box .emo { font-size:3rem; margin-bottom:1rem; }
+  .success-box h3 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:var(--success); }
+  .success-box p { color:var(--muted); font-size:.9rem; margin-top:.5rem; line-height:1.7; }
+
+  @media(max-width:480px){
+    .hero { padding:4rem 1rem 2.5rem; }
+    .block { padding:1.4rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✦ <span>GelDouche</span> — Votre avis compte</div>
+</header>
+
+<div class="hero">
+  <div class="pill">⏱ 3 minutes · Anonyme · 21 questions</div>
+  <h1>Créez le gel douche<br><em>de vos rêves</em></h1>
+  <p>Je crée une nouvelle marque française de gel douche. Votre avis m'est précieux pour concevoir le produit parfait. Merci !</p>
+</div>
+
+<div class="form-wrap">
+  <form id="form">
+
+    <!-- BLOC 1 -->
+    <div class="block">
+      <div class="blk-header"><div class="blk-num">1</div><div class="blk-title">Votre profil</div></div>
+
+      <div class="q">
+        <div class="q-text">1. Quel est votre genre ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q1" value="Femme"><span class="cbox"></span><span class="clabel">Femme</span></label>
+          <label class="choice-item"><input type="radio" name="q1" value="Homme"><span class="cbox"></span><span class="clabel">Homme</span></label>
+          <label class="choice-item"><input type="radio" name="q1" value="Non-binaire"><span class="cbox"></span><span class="clabel">Non-binaire / Ne souhaite pas se prononcer</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">2. Quelle est votre tranche d'âge ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q2" value="Moins de 18 ans"><span class="cbox"></span><span class="clabel">Moins de 18 ans</span></label>
+          <label class="choice-item"><input type="radio" name="q2" value="18–25 ans"><span class="cbox"></span><span class="clabel">18 – 25 ans</span></label>
+          <label class="choice-item"><input type="radio" name="q2" value="26–35 ans"><span class="cbox"></span><span class="clabel">26 – 35 ans</span></label>
+          <label class="choice-item"><input type="radio" name="q2" value="36–50 ans"><span class="cbox"></span><span class="clabel">36 – 50 ans</span></label>
+          <label class="choice-item"><input type="radio" name="q2" value="Plus de 50 ans"><span class="cbox"></span><span class="clabel">Plus de 50 ans</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">3. Quel est votre type de peau ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q3" value="Normale"><span class="cbox"></span><span class="clabel">Normale</span></label>
+          <label class="choice-item"><input type="radio" name="q3" value="Sèche / Très sèche"><span class="cbox"></span><span class="clabel">Sèche / Très sèche (tiraillements)</span></label>
+          <label class="choice-item"><input type="radio" name="q3" value="Sensible / Réactive"><span class="cbox"></span><span class="clabel">Sensible / Réactive / Atopique</span></label>
+          <label class="choice-item"><input type="radio" name="q3" value="Grasse"><span class="cbox"></span><span class="clabel">Grasse ou à imperfections</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">4. Comment qualifieriez-vous votre carnation ?</div>
+        <div class="q-note">Cela permet d'adapter les actifs aux besoins spécifiques de chaque type de peau.</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q4" value="Très claire / Claire"><span class="cbox"></span><span class="clabel">Très claire / Claire</span></label>
+          <label class="choice-item"><input type="radio" name="q4" value="Médium / Mate"><span class="cbox"></span><span class="clabel">Médium / Mate</span></label>
+          <label class="choice-item"><input type="radio" name="q4" value="Métissée / Olive"><span class="cbox"></span><span class="clabel">Métissée / Olive</span></label>
+          <label class="choice-item"><input type="radio" name="q4" value="Noire / Foncée"><span class="cbox"></span><span class="clabel">Noire / Foncée</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOC 2 -->
+    <div class="block">
+      <div class="blk-header"><div class="blk-num">2</div><div class="blk-title">Habitudes &amp; achat</div></div>
+
+      <div class="q">
+        <div class="q-text">5. À quelle fréquence achetez-vous du gel douche ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q5" value="Plus d'une fois par mois"><span class="cbox"></span><span class="clabel">Plus d'une fois par mois</span></label>
+          <label class="choice-item"><input type="radio" name="q5" value="Une fois par mois"><span class="cbox"></span><span class="clabel">Environ une fois par mois</span></label>
+          <label class="choice-item"><input type="radio" name="q5" value="Tous les 2–3 mois"><span class="cbox"></span><span class="clabel">Tous les 2 à 3 mois</span></label>
+          <label class="choice-item"><input type="radio" name="q5" value="Moins souvent"><span class="cbox"></span><span class="clabel">Moins souvent</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">6. Qui va principalement utiliser ce gel douche chez vous ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q6" value="Uniquement moi"><span class="cbox"></span><span class="clabel">Uniquement moi</span></label>
+          <label class="choice-item"><input type="radio" name="q6" value="Mon/ma partenaire et moi"><span class="cbox"></span><span class="clabel">Mon / ma partenaire et moi</span></label>
+          <label class="choice-item"><input type="radio" name="q6" value="Toute la famille"><span class="cbox"></span><span class="clabel">Toute la famille (y compris les enfants)</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">7. Où achetez-vous principalement votre gel douche ? <span class="limit">(2 choix max)</span></div>
+        <div class="choices">
+          <label class="choice-item"><input type="checkbox" name="q7" value="Grande surface"><span class="cbox"></span><span class="clabel">Grande surface (Leclerc, Carrefour, Auchan...)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q7" value="Parapharmacie / Pharmacie"><span class="cbox"></span><span class="clabel">Parapharmacie / Pharmacie</span></label>
+          <label class="choice-item"><input type="checkbox" name="q7" value="Magasin bio"><span class="cbox"></span><span class="clabel">Magasin bio / spécialisé</span></label>
+          <label class="choice-item"><input type="checkbox" name="q7" value="Internet"><span class="cbox"></span><span class="clabel">Sur Internet / En ligne</span></label>
+          <label class="choice-item"><input type="checkbox" name="q7" value="Autre"><span class="cbox"></span><span class="clabel">Autre</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">8. Utilisez-vous des apps comme Yuka ou INCI Beauty ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q8" value="Oui, systématiquement"><span class="cbox"></span><span class="clabel">Oui, systématiquement (je n'achète pas si la note est mauvaise)</span></label>
+          <label class="choice-item"><input type="radio" name="q8" value="Oui, occasionnellement"><span class="cbox"></span><span class="clabel">Oui, occasionnellement</span></label>
+          <label class="choice-item"><input type="radio" name="q8" value="Je lis les ingrédients"><span class="cbox"></span><span class="clabel">Non, mais je lis attentivement les ingrédients</span></label>
+          <label class="choice-item"><input type="radio" name="q8" value="Non"><span class="cbox"></span><span class="clabel">Non, je ne regarde pas la composition</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">9. Le « Fabriqué en France » est-il un critère important pour vous ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q9" value="Critère décisif"><span class="cbox"></span><span class="clabel">Oui, critère décisif (prêt(e) à payer plus cher)</span></label>
+          <label class="choice-item"><input type="radio" name="q9" value="Si écart raisonnable"><span class="cbox"></span><span class="clabel">Oui, si l'écart de prix reste raisonnable (+10% max)</span></label>
+          <label class="choice-item"><input type="radio" name="q9" value="Non, pas important"><span class="cbox"></span><span class="clabel">Non, ce n'est pas un critère important</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">10. Quel budget pour un flacon standard de 250ml de qualité ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q10" value="Moins de 3 €"><span class="cbox"></span><span class="clabel">Moins de 3 € (Prix supermarché classique)</span></label>
+          <label class="choice-item"><input type="radio" name="q10" value="3 € – 6 €"><span class="cbox"></span><span class="clabel">Entre 3 € et 6 € (Milieu de gamme)</span></label>
+          <label class="choice-item"><input type="radio" name="q10" value="6 € – 10 €"><span class="cbox"></span><span class="clabel">Entre 6 € et 10 € (Parapharmacie / marque engagée)</span></label>
+          <label class="choice-item"><input type="radio" name="q10" value="Plus de 10 €"><span class="cbox"></span><span class="clabel">Plus de 10 € (Premium / niche)</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOC 3 -->
+    <div class="block">
+      <div class="blk-header"><div class="blk-num">3</div><div class="blk-title">Expérience sensorielle</div></div>
+
+      <div class="q">
+        <div class="q-text">11. Quels parfums / odeurs préférez-vous ? <span class="limit">(3 choix max)</span></div>
+        <div class="choices">
+          <label class="choice-item"><input type="checkbox" name="q11" value="Fruités"><span class="cbox"></span><span class="clabel">Fruités (agrumes, mangue, fruits rouges...)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q11" value="Floraux"><span class="cbox"></span><span class="clabel">Floraux (rose, jasmin, lavande...)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q11" value="Frais / Aquatiques"><span class="cbox"></span><span class="clabel">Frais / Aquatiques (menthe, aloe vera, brise marine...)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q11" value="Gourmands"><span class="cbox"></span><span class="clabel">Gourmands (vanille, amande, miel, coco...)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q11" value="Boisés / Orientaux"><span class="cbox"></span><span class="clabel">Boisés / Orientaux (cèdre, santal, épices...)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q11" value="Sans parfum"><span class="cbox"></span><span class="clabel">Sans parfum (neutre)</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">12. Après la douche, souhaitez-vous que le parfum reste sur votre peau ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q12" value="Oui, plusieurs heures"><span class="cbox"></span><span class="clabel">Oui, absolument (plusieurs heures sur la peau)</span></label>
+          <label class="choice-item"><input type="radio" name="q12" value="Légèrement"><span class="cbox"></span><span class="clabel">Légèrement, une odeur subtile juste après</span></label>
+          <label class="choice-item"><input type="radio" name="q12" value="Non"><span class="cbox"></span><span class="clabel">Non, agréable sous la douche seulement</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">13. Quelle texture préférez-vous ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q13" value="Gel transparent"><span class="cbox"></span><span class="clabel">Gel transparent classique</span></label>
+          <label class="choice-item"><input type="radio" name="q13" value="Crème opaque et lactée"><span class="cbox"></span><span class="clabel">Crème douche opaque et lactée</span></label>
+          <label class="choice-item"><input type="radio" name="q13" value="Huile de douche"><span class="cbox"></span><span class="clabel">Huile de douche nourrissante</span></label>
+          <label class="choice-item"><input type="radio" name="q13" value="Mousse / chantilly"><span class="cbox"></span><span class="clabel">Texture mousseuse / chantilly</span></label>
+          <label class="choice-item"><input type="radio" name="q13" value="Peu importe"><span class="cbox"></span><span class="clabel">Peu m'importe, sans colorants artificiels</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">14. Quelle est votre attente concernant la mousse ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q14" value="Beaucoup de mousse"><span class="cbox"></span><span class="clabel">J'aime quand ça mousse énormément</span></label>
+          <label class="choice-item"><input type="radio" name="q14" value="Mousse légère"><span class="cbox"></span><span class="clabel">Une mousse légère me convient</span></label>
+          <label class="choice-item"><input type="radio" name="q14" value="Peu importe"><span class="cbox"></span><span class="clabel">La mousse m'importe peu</span></label>
+          <label class="choice-item"><input type="radio" name="q14" value="Sans mousse"><span class="cbox"></span><span class="clabel">Je préfère les formules sans mousse</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">15. Concernant le rinçage, qu'est-ce qui compte le plus ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q15" value="Peau nette, pas de film"><span class="cbox"></span><span class="clabel">Se rince vite, peau nette sans film résiduel</span></label>
+          <label class="choice-item"><input type="radio" name="q15" value="Film hydratant"><span class="cbox"></span><span class="clabel">Laisse un léger film hydratant après le rinçage</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">16. Quel bouchon trouvez-vous le plus pratique sous la douche ?</div>
+        <div class="choices">
+          <label class="choice-item"><input type="radio" name="q16" value="Pompe"><span class="cbox"></span><span class="clabel">Flacon pompe (pratique d'une seule main)</span></label>
+          <label class="choice-item"><input type="radio" name="q16" value="Clapet"><span class="cbox"></span><span class="clabel">Bouchon à clapet classique</span></label>
+          <label class="choice-item"><input type="radio" name="q16" value="Vissé"><span class="cbox"></span><span class="clabel">Bouchon à visser (étanche pour le transport)</span></label>
+          <label class="choice-item"><input type="radio" name="q16" value="Inversé"><span class="cbox"></span><span class="clabel">Système inversé (flacon tête en bas)</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">17. Quel conditionnement utiliseriez-vous au quotidien ? <span class="limit">(2 choix max)</span></div>
+        <div class="choices">
+          <label class="choice-item"><input type="checkbox" name="q17" value="Plastique recyclable"><span class="cbox"></span><span class="clabel">Flacon plastique recyclable</span></label>
+          <label class="choice-item"><input type="checkbox" name="q17" value="Verre"><span class="cbox"></span><span class="clabel">Flacon en verre (esthétique, rechargeable)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q17" value="Éco-recharge souple"><span class="cbox"></span><span class="clabel">Éco-recharge souple</span></label>
+          <label class="choice-item"><input type="checkbox" name="q17" value="Recharge pastille"><span class="cbox"></span><span class="clabel">Recharge innovante (pastille à diluer)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q17" value="Solide"><span class="cbox"></span><span class="clabel">Format solide (pain de douche, sans flacon)</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOC 4 -->
+    <div class="block">
+      <div class="blk-header"><div class="blk-num">4</div><div class="blk-title">Attentes &amp; innovations</div></div>
+
+      <div class="q">
+        <div class="q-text">18. Vos 3 critères les plus importants dans un gel douche ? <span class="limit">(3 choix max)</span></div>
+        <div class="choices">
+          <label class="choice-item"><input type="checkbox" name="q18" value="Le prix"><span class="cbox"></span><span class="clabel">Le prix</span></label>
+          <label class="choice-item"><input type="checkbox" name="q18" value="Le parfum"><span class="cbox"></span><span class="clabel">Le parfum / l'odeur</span></label>
+          <label class="choice-item"><input type="checkbox" name="q18" value="Note Yuka / INCI"><span class="cbox"></span><span class="clabel">La note sur Yuka / INCI Beauty</span></label>
+          <label class="choice-item"><input type="checkbox" name="q18" value="Effet sur la peau"><span class="cbox"></span><span class="clabel">L'effet ciblé sur la peau</span></label>
+          <label class="choice-item"><input type="checkbox" name="q18" value="Packaging"><span class="cbox"></span><span class="clabel">Le packaging (beauté, praticité)</span></label>
+          <label class="choice-item"><input type="checkbox" name="q18" value="Éco-responsabilité"><span class="cbox"></span><span class="clabel">L'éco-responsabilité</span></label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-text">19. Quel ingrédient ou actif naturel aimeriez-vous trouver dans la formule ?</div>
+        <textarea name="q19" placeholder="Ex : huile d'argan, aloe vera, beurre de karité..."></textarea>
+      </div>
+
+      <div class="q">
+        <div class="q-text">20. Qu'est-ce qui vous agace le plus avec votre gel douche actuel ?</div>
+        <textarea name="q20" placeholder="Dites-nous tout..."></textarea>
+      </div>
+
+      <div class="q">
+        <div class="q-text">21. Si vous pouviez créer le gel douche de vos rêves, à quoi ressemblerait-il ?</div>
+        <textarea name="q21" placeholder="Décrivez votre idéal en quelques mots..."></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">✦ Envoyer mes réponses</button>
+
+    <div class="success-box" id="ok">
+      <div class="emo">🎉</div>
+      <h3>Merci beaucoup !</h3>
+      <p>Vos réponses ont bien été enregistrées.<br>Vous m'aidez à créer quelque chose d'incroyable.</p>
+    </div>
+  </form>
+</div>
+
+<script>
+const KEY = 'gd_responses';
+function get(){ try{ return JSON.parse(localStorage.getItem(KEY))||[]; }catch{return [];} }
+
+document.getElementById('form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const fd = new FormData(this);
+  const names = [...new Set([...this.querySelectorAll('[name]')].map(el=>el.name))];
+  const r = { ts: Date.now() };
+  names.forEach(n => { const v=fd.getAll(n); r[n]=v.length===1?v[0]:v; });
+  const all = get(); all.push(r);
+  localStorage.setItem(KEY, JSON.stringify(all));
+  this.style.display='none';
+  document.getElementById('ok').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+</script>
+</body>
+</html>

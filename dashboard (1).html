@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — GelDouche</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#07070f; --bg2:#0d0d1a; --card:#111120; --border:#1e1e38;
+    --accent:#d4a96a; --accent2:#8b7fd4; --accent3:#4ecb8d;
+    --accent4:#e05c7a; --text:#ece9f8; --muted:#5e5c7a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;}
+
+  /* ── LOGIN ── */
+  #login{
+    display:flex;align-items:center;justify-content:center;min-height:100vh;
+    background:radial-gradient(ellipse 60% 50% at 50% 30%, rgba(139,127,212,.2) 0%, transparent 70%);
+  }
+  .login-box{
+    background:var(--card);border:1px solid var(--border);border-radius:20px;
+    padding:3rem 2.5rem;width:min(380px,92vw);text-align:center;
+    box-shadow:0 40px 80px rgba(0,0,0,.5);
+  }
+  .login-box .icon{font-size:2.5rem;margin-bottom:1rem;}
+  .login-box h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--accent);margin-bottom:.4rem;}
+  .login-box p{color:var(--muted);font-size:.85rem;margin-bottom:1.8rem;}
+  .pw-wrap{position:relative;margin-bottom:1rem;}
+  .pw-wrap input{
+    width:100%;background:var(--bg2);border:1.5px solid var(--border);
+    border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;
+    font-size:1rem;padding:.85rem 1rem;letter-spacing:.2em;outline:none;
+    transition:border-color .2s;text-align:center;
+  }
+  .pw-wrap input:focus{border-color:var(--accent2);}
+  .pw-wrap input::placeholder{letter-spacing:normal;color:var(--muted);}
+  .err{color:var(--accent4);font-size:.8rem;margin-bottom:.8rem;display:none;}
+  .login-btn{
+    width:100%;padding:.9rem;border-radius:10px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),#e8c48a);
+    color:#07070f;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;
+    transition:opacity .2s;
+  }
+  .login-btn:hover{opacity:.85;}
+
+  /* ── DASHBOARD ── */
+  #dash{display:none;}
+
+  header{
+    position:sticky;top:0;z-index:50;
+    padding:1rem 2rem;
+    background:rgba(7,7,15,.9);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  }
+  .logo{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--accent);}
+  .logo em{font-style:italic;}
+  .hdr-right{display:flex;align-items:center;gap:1rem;}
+  .resp-count{
+    background:rgba(212,169,106,.12);border:1px solid rgba(212,169,106,.25);
+    color:var(--accent);font-size:.78rem;padding:.3rem .9rem;border-radius:999px;
+  }
+  .clear-btn{
+    background:none;border:1px solid rgba(224,92,122,.35);color:var(--accent4);
+    padding:.35rem .9rem;border-radius:8px;cursor:pointer;font-size:.78rem;
+    font-family:'DM Sans',sans-serif;transition:all .2s;
+  }
+  .clear-btn:hover{background:rgba(224,92,122,.12);}
+
+  .dash-body{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 6rem;}
+
+  /* KPIs */
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;}
+  .kpi{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:1.5rem;text-align:center;position:relative;overflow:hidden;
+  }
+  .kpi::after{
+    content:'';position:absolute;inset:0;border-radius:16px;
+    background:radial-gradient(circle at 50% 0%, rgba(212,169,106,.07) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .kpi-val{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--accent);line-height:1;}
+  .kpi-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:.5rem;}
+
+  /* section title */
+  .sec-title{
+    font-size:.68rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent2);
+    margin:2.5rem 0 1rem;display:flex;align-items:center;gap:.8rem;
+  }
+  .sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* chart grid */
+  .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.2rem;}
+  .chart-card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:1.6rem;
+  }
+  .chart-card h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:1.2rem;}
+
+  /* verbatim */
+  .verbatim-grid{display:grid;grid-template-columns:1fr;gap:1.2rem;}
+  .verbatim-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.6rem;}
+  .verbatim-card h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:1rem;}
+  .verb-list{display:flex;flex-direction:column;gap:.6rem;}
+  .verb-item{
+    background:var(--bg2);border-left:3px solid var(--accent2);
+    border-radius:0 8px 8px 0;padding:.7rem 1rem;
+    font-size:.85rem;color:var(--text);line-height:1.6;font-style:italic;
+  }
+
+  /* empty */
+  .empty{text-align:center;padding:5rem 1rem;color:var(--muted);}
+  .empty .big{font-size:3rem;margin-bottom:1rem;}
+
+  @media(max-width:540px){
+    .dash-body{padding:1.5rem 1rem 5rem;}
+    header{padding:.8rem 1rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="icon">🔒</div>
+    <h2>Accès réservé</h2>
+    <p>Tableau de bord — GelDouche Survey</p>
+    <div class="pw-wrap">
+      <input type="password" id="pw" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')auth()">
+    </div>
+    <div class="err" id="err">❌ Mot de passe incorrect</div>
+    <button class="login-btn" onclick="auth()">Accéder au tableau de bord →</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <header>
+    <div class="logo">✦ <em>GelDouche</em> — Tableau de bord</div>
+    <div class="hdr-right">
+      <div class="resp-count" id="respCount">0 réponse</div>
+      <button class="clear-btn" onclick="clearAll()">🗑 Réinitialiser</button>
+    </div>
+  </header>
+
+  <div class="dash-body" id="dashBody">
+    <div class="empty"><div class="big">📭</div><p>Aucune réponse pour l'instant.<br>Partagez le questionnaire pour commencer à collecter des données !</p></div>
+  </div>
+</div>
+
+<script>
+const KEY = 'gd_responses';
+const PWD = 'rico243';
+
+// ── AUTH ──
+function auth(){
+  const v = document.getElementById('pw').value;
+  if(v === PWD){
+    document.getElementById('login').style.display='none';
+    document.getElementById('dash').style.display='block';
+    render();
+  } else {
+    document.getElementById('err').style.display='block';
+    document.getElementById('pw').value='';
+  }
+}
+
+function clearAll(){
+  if(confirm('Supprimer toutes les réponses ?')){
+    localStorage.removeItem(KEY);
+    render();
+  }
+}
+
+// ── DATA ──
+function get(){ try{ return JSON.parse(localStorage.getItem(KEY))||[]; }catch{return [];} }
+
+function cnt(res,field,val){
+  return res.filter(r=>{
+    const v=r[field];
+    return Array.isArray(v)?v.includes(val):v===val;
+  }).length;
+}
+
+function topVal(res,field){
+  const f={};
+  res.forEach(r=>{const v=r[field];(Array.isArray(v)?v:[v]).forEach(x=>{if(x)f[x]=(f[x]||0)+1;});});
+  return Object.entries(f).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+}
+
+// ── COLORS ──
+const C={
+  gold:'rgba(212,169,106,',
+  purple:'rgba(139,127,212,',
+  green:'rgba(78,203,141,',
+  pink:'rgba(224,92,122,',
+  blue:'rgba(96,165,250,',
+  orange:'rgba(251,146,60,',
+};
+function pal(base,n,a=.8){
+  const cols=['gold','purple','green','pink','blue','orange'];
+  return Array.from({length:n},(_,i)=>C[cols[(cols.indexOf(base)+i)%cols.length]]+a+')');
+}
+
+// Chart defaults
+Chart.defaults.color='#5e5c7a';
+Chart.defaults.borderColor='#1e1e38';
+Chart.defaults.font.family='DM Sans';
+
+let charts=[];
+function destroyCharts(){charts.forEach(c=>c.destroy());charts=[];}
+
+function mkChart(id,cfg){
+  const c=new Chart(document.getElementById(id),cfg);
+  charts.push(c); return c;
+}
+
+// ── RENDER ──
+function render(){
+  const res=get();
+  const n=res.length;
+  document.getElementById('respCount').textContent=n+' réponse'+(n>1?'s':'');
+  destroyCharts();
+
+  if(n===0){
+    document.getElementById('dashBody').innerHTML=`<div class="empty"><div class="big">📭</div><p>Aucune réponse pour l'instant.<br>Partagez le questionnaire pour commencer !</p></div>`;
+    return;
+  }
+
+  const female=cnt(res,'q1','Femme');
+  const topAge=topVal(res,'q2');
+  const topPrice=topVal(res,'q10');
+  const topParfum=topVal(res,'q11');
+
+  const html=`
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">${n}</div><div class="kpi-label">Réponses totales</div></div>
+    <div class="kpi"><div class="kpi-val">${Math.round(female/n*100)}%</div><div class="kpi-label">Femmes</div></div>
+    <div class="kpi"><div class="kpi-val" style="font-size:1.6rem">${topAge}</div><div class="kpi-label">Tranche majoritaire</div></div>
+    <div class="kpi"><div class="kpi-val" style="font-size:1.4rem">${topPrice}</div><div class="kpi-label">Budget favori</div></div>
+    <div class="kpi"><div class="kpi-val" style="font-size:1.4rem">${topParfum}</div><div class="kpi-label">Parfum favori</div></div>
+  </div>
+
+  <!-- PROFIL -->
+  <div class="sec-title">Profil des répondants</div>
+  <div class="chart-grid">
+    <div class="chart-card"><h4>Genre</h4><canvas id="c1" height="200"></canvas></div>
+    <div class="chart-card"><h4>Tranche d'âge</h4><canvas id="c2" height="200"></canvas></div>
+    <div class="chart-card"><h4>Type de peau</h4><canvas id="c3" height="200"></canvas></div>
+    <div class="chart-card"><h4>Carnation</h4><canvas id="c4" height="200"></canvas></div>
+  </div>
+
+  <!-- ACHATS -->
+  <div class="sec-title">Habitudes d'achat</div>
+  <div class="chart-grid">
+    <div class="chart-card"><h4>Fréquence d'achat</h4><canvas id="c5" height="220"></canvas></div>
+    <div class="chart-card"><h4>Usage familial</h4><canvas id="c6" height="220"></canvas></div>
+    <div class="chart-card"><h4>Lieu d'achat</h4><canvas id="c7" height="220"></canvas></div>
+    <div class="chart-card"><h4>Applications Yuka / INCI</h4><canvas id="c8" height="220"></canvas></div>
+    <div class="chart-card"><h4>Made in France</h4><canvas id="c9" height="220"></canvas></div>
+    <div class="chart-card"><h4>Budget (250ml)</h4><canvas id="c10" height="220"></canvas></div>
+  </div>
+
+  <!-- SENSORIEL -->
+  <div class="sec-title">Expérience sensorielle</div>
+  <div class="chart-grid">
+    <div class="chart-card"><h4>Familles de parfums</h4><canvas id="c11" height="220"></canvas></div>
+    <div class="chart-card"><h4>Tenue du parfum après douche</h4><canvas id="c12" height="220"></canvas></div>
+    <div class="chart-card"><h4>Texture préférée</h4><canvas id="c13" height="220"></canvas></div>
+    <div class="chart-card"><h4>Attente sur la mousse</h4><canvas id="c14" height="220"></canvas></div>
+    <div class="chart-card"><h4>Préférence rinçage</h4><canvas id="c15" height="220"></canvas></div>
+    <div class="chart-card"><h4>Type de bouchon</h4><canvas id="c16" height="220"></canvas></div>
+    <div class="chart-card"><h4>Conditionnement</h4><canvas id="c17" height="220"></canvas></div>
+  </div>
+
+  <!-- ATTENTES -->
+  <div class="sec-title">Attentes & priorités</div>
+  <div class="chart-grid">
+    <div class="chart-card" style="grid-column:1/-1"><h4>Critères les plus importants (Q18)</h4><canvas id="c18" height="160"></canvas></div>
+  </div>
+
+  <!-- VERBATIMS -->
+  <div class="sec-title">Réponses ouvertes</div>
+  <div class="verbatim-grid">
+    <div class="verbatim-card"><h4>19 — Ingrédient naturel souhaité</h4><div class="verb-list" id="v19"></div></div>
+    <div class="verbatim-card"><h4>20 — Ce qui agace avec le gel douche actuel</h4><div class="verb-list" id="v20"></div></div>
+    <div class="verbatim-card"><h4>21 — Le gel douche de vos rêves</h4><div class="verb-list" id="v21"></div></div>
+  </div>
+  `;
+
+  document.getElementById('dashBody').innerHTML=html;
+
+  // helper: donut
+  function donut(id,labels,data,colors){
+    mkChart(id,{
+      type:'doughnut',
+      data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#07070f',borderWidth:3,hoverOffset:6}]},
+      options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:14,boxWidth:12,font:{size:11}}}}}
+    });
+  }
+
+  // helper: horizontal bar
+  function hbar(id,labels,data,color){
+    mkChart(id,{
+      type:'bar',
+      data:{labels,datasets:[{data,backgroundColor:data.map((_,i)=>color.replace('0.8',(0.55+i*0.07).toFixed(2))),borderRadius:6,borderSkipped:false}]},
+      options:{
+        indexAxis:'y',
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{color:'#1e1e38'},ticks:{stepSize:1,color:'#5e5c7a'}},y:{grid:{display:false},ticks:{color:'#9d9bbf',font:{size:11}}}},
+      }
+    });
+  }
+
+  // helper: vertical bar
+  function vbar(id,labels,data,colors){
+    mkChart(id,{
+      type:'bar',
+      data:{labels,datasets:[{data,backgroundColor:colors,borderRadius:8,borderSkipped:false}]},
+      options:{
+        plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false},ticks:{color:'#9d9bbf',font:{size:10}}},y:{grid:{color:'#1e1e38'},ticks:{stepSize:1,color:'#5e5c7a'}}},
+      }
+    });
+  }
+
+  // Q1 genre — donut
+  donut('c1',
+    ['Femme','Homme','Non-binaire'],
+    ['Femme','Homme','Non-binaire'].map(v=>cnt(res,'q1',v)),
+    [C.gold+'0.85)',C.purple+'0.85)',C.green+'0.85)']
+  );
+
+  // Q2 age — vertical bar
+  const ages=['Moins de 18 ans','18–25 ans','26–35 ans','36–50 ans','Plus de 50 ans'];
+  vbar('c2',ages,ages.map(v=>cnt(res,'q2',v)),pal('purple',5));
+
+  // Q3 type peau — donut
+  const peaux=['Normale','Sèche / Très sèche','Sensible / Réactive','Grasse'];
+  donut('c3',peaux,peaux.map(v=>cnt(res,'q3',v)),[C.green+'0.85)',C.gold+'0.85)',C.pink+'0.85)',C.blue+'0.85)']);
+
+  // Q4 carnation — donut
+  const carn=['Très claire / Claire','Médium / Mate','Métissée / Olive','Noire / Foncée'];
+  donut('c4',carn,carn.map(v=>cnt(res,'q4',v)),pal('orange',4,.85));
+
+  // Q5 fréquence — hbar
+  const freq=["Plus d'une fois par mois","Une fois par mois","Tous les 2–3 mois","Moins souvent"];
+  hbar('c5',freq,freq.map(v=>cnt(res,'q5',v)),C.gold+'0.8)');
+
+  // Q6 usage — donut
+  const usa=['Uniquement moi','Mon/ma partenaire et moi','Toute la famille'];
+  donut('c6',usa,usa.map(v=>cnt(res,'q6',v)),pal('blue',3,.85));
+
+  // Q7 lieu — hbar
+  const lieu=['Grande surface','Parapharmacie / Pharmacie','Magasin bio','Internet','Autre'];
+  hbar('c7',lieu,lieu.map(v=>cnt(res,'q7',v)),C.purple+'0.8)');
+
+  // Q8 yuka — hbar
+  const yuka=['Oui, systématiquement','Oui, occasionnellement','Je lis les ingrédients','Non'];
+  hbar('c8',yuka,yuka.map(v=>cnt(res,'q8',v)),C.green+'0.8)');
+
+  // Q9 made in france — donut
+  const mif=['Critère décisif','Si écart raisonnable','Non, pas important'];
+  donut('c9',mif,mif.map(v=>cnt(res,'q9',v)),[C.accent3+'0.85)',C.gold+'0.85)',C.pink+'0.85)'].map(x=>x));
+
+  // Q10 budget — vertical bar
+  const bud=['Moins de 3 €','3 € – 6 €','6 € – 10 €','Plus de 10 €'];
+  vbar('c10',bud,bud.map(v=>cnt(res,'q10',v)),pal('gold',4));
+
+  // Q11 parfums — hbar (horizontal → ranking visuel)
+  const parf=['Fruités','Floraux','Frais / Aquatiques','Gourmands','Boisés / Orientaux','Sans parfum'];
+  // sort by count desc
+  const parfData=parf.map(v=>({l:v,c:cnt(res,'q11',v)})).sort((a,b)=>b.c-a.c);
+  hbar('c11',parfData.map(d=>d.l),parfData.map(d=>d.c),C.gold+'0.8)');
+
+  // Q12 tenue parfum — donut
+  const ten=['Oui, plusieurs heures','Légèrement','Non'];
+  donut('c12',ten,ten.map(v=>cnt(res,'q12',v)),pal('purple',3,.85));
+
+  // Q13 texture — hbar
+  const tex=['Gel transparent','Crème opaque et lactée','Huile de douche','Mousse / chantilly','Peu importe'];
+  hbar('c13',tex,tex.map(v=>cnt(res,'q13',v)),C.blue+'0.8)');
+
+  // Q14 mousse — donut
+  const mou=['Beaucoup de mousse','Mousse légère','Peu importe','Sans mousse'];
+  donut('c14',mou,mou.map(v=>cnt(res,'q14',v)),pal('green',4,.85));
+
+  // Q15 rinçage — donut (2 valeurs = parfait pour donut)
+  const rinc=['Peau nette, pas de film','Film hydratant'];
+  donut('c15',rinc,rinc.map(v=>cnt(res,'q15',v)),[C.gold+'0.85)',C.purple+'0.85)']);
+
+  // Q16 bouchon — hbar
+  const bouch=['Pompe','Clapet','Vissé','Inversé'];
+  hbar('c16',bouch,bouch.map(v=>cnt(res,'q16',v)),C.orange+'0.8)');
+
+  // Q17 conditionnement — hbar
+  const cond=['Plastique recyclable','Verre','Éco-recharge souple','Recharge pastille','Solide'];
+  hbar('c17',cond,cond.map(v=>cnt(res,'q17',v)),C.green+'0.8)');
+
+  // Q18 critères — horizontal bar (ranking top)
+  const crit=['Le prix','Le parfum','Note Yuka / INCI','Effet sur la peau','Packaging','Éco-responsabilité'];
+  const critData=crit.map(v=>({l:v,c:cnt(res,'q18',v)})).sort((a,b)=>b.c-a.c);
+  mkChart('c18',{
+    type:'bar',
+    data:{
+      labels:critData.map(d=>d.l),
+      datasets:[{
+        data:critData.map(d=>d.c),
+        backgroundColor:pal('gold',6),
+        borderRadius:8,borderSkipped:false
+      }]
+    },
+    options:{
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#9d9bbf',font:{size:11}}},
+        y:{grid:{color:'#1e1e38'},ticks:{stepSize:1,color:'#5e5c7a'}}
+      }
+    }
+  });
+
+  // Verbatims
+  ['q19','q20','q21'].forEach(q=>{
+    const answers=res.map(r=>r[q]).filter(Boolean);
+    const el=document.getElementById('v'+q.slice(1));
+    if(answers.length===0){ el.innerHTML='<div style="color:var(--muted);font-size:.85rem;font-style:italic">Aucune réponse pour l\'instant.</div>'; return; }
+    el.innerHTML=answers.map(a=>`<div class="verb-item">"${a}"</div>`).join('');
+  });
+}
+</script>
+</body>
+</html>
